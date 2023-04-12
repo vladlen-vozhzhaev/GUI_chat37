@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox prefWidth="Infinity" prefHeight="Infinity" alignment="CENTER" spacing="20.0" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/17.0.2-ea" fx:controller="com.example.guichat37.HelloController">
+   <VBox prefWidth="200" prefHeight="Infinity" fx:id="usersList"/>
+   <VBox prefWidth="300" prefHeight="400">
+      <TextArea editable="false" prefHeight="350" prefWidth="Infinity" fx:id="messageTextArea"/>
+      <HBox prefHeight="50.0" prefWidth="Infinity">
+            <TextField onAction="#send" prefWidth="225" fx:id="messageTextField"/>
+            <Button fx:id="sendBtn" onAction="#send" prefWidth="75" text="Отправить" disable="true"/>
+      </HBox>
+      <Button
+              fx:id="connectBtn"
+              onAction="#connect"
+              prefWidth="Infinity"
+              text="Подключиться к серверу"/>
+   </VBox>
+</HBox>
