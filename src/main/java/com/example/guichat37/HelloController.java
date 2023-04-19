@@ -20,6 +20,8 @@ public class HelloController {
     Socket socket;
     DataInputStream in;
     DataOutputStream out;
+    boolean publicMessage = true;
+    int toUser = 0;
     @FXML
     private Label welcomeText;
     @FXML
@@ -40,8 +42,9 @@ public class HelloController {
             System.out.println(message);
             messageTextArea.appendText("Вы: "+message+"\n");
             messageTextField.clear();
-            jsonObject.put("public", true);
+            jsonObject.put("public", publicMessage);
             jsonObject.put("msg", message);
+            jsonObject.put("id", toUser);
             out.writeUTF(jsonObject.toJSONString());
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -74,10 +77,17 @@ public class HelloController {
                                     @Override
                                     public void run() {
                                         usersList.getChildren().clear();
-                                        onlineUsers.forEach(userName->{
+                                        onlineUsers.forEach(user->{
                                             Button userBtn = new Button();
-                                            userBtn.setText((String) userName);
+                                            JSONObject jsonUserObject = (JSONObject) user;
+                                            userBtn.setText(jsonUserObject.get("name").toString());
                                             usersList.getChildren().add(userBtn);
+                                            userBtn.setOnAction(e->{
+                                                messageTextArea.clear();
+                                                // Тут получаем приватные сообщения из БД
+                                                publicMessage = false;
+                                                toUser = Integer.parseInt(jsonUserObject.get("id").toString());
+                                            });
                                         });
                                     }
                                 });
