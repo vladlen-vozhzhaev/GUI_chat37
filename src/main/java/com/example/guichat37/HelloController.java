@@ -22,6 +22,7 @@ public class HelloController {
     DataOutputStream out;
     boolean publicMessage = true;
     int toUser = 0;
+    int selfId;
     @FXML
     private Label welcomeText;
     @FXML
@@ -69,7 +70,9 @@ public class HelloController {
                             jsonObject = (JSONObject) jsonParser.parse(response);
                             System.out.println("Сообщение: "+jsonObject.get("msg"));
                             System.out.println("Пользователи: "+jsonObject.get("onlineUsers"));
-                            if(jsonObject.get("msg") != null){
+                            if(jsonObject.get("self_id") != null){
+                                selfId = Integer.parseInt(jsonObject.get("self_id").toString());
+                            }else if(jsonObject.get("msg") != null){
                                 messageTextArea.appendText(jsonObject.get("msg")+"\n");
                             }else if(jsonObject.get("onlineUsers") != null){
                                 JSONArray onlineUsers = (JSONArray) jsonObject.get("onlineUsers");
@@ -80,13 +83,25 @@ public class HelloController {
                                         onlineUsers.forEach(user->{
                                             Button userBtn = new Button();
                                             JSONObject jsonUserObject = (JSONObject) user;
+                                            if(Integer.parseInt(jsonUserObject.get("id").toString()) == selfId)
+                                                return;
                                             userBtn.setText(jsonUserObject.get("name").toString());
+                                            userBtn.setPrefWidth(200);
+                                            userBtn.setLineSpacing(5);
                                             usersList.getChildren().add(userBtn);
                                             userBtn.setOnAction(e->{
+                                                JSONObject jsonObject1 = new JSONObject();
                                                 messageTextArea.clear();
                                                 // Тут получаем приватные сообщения из БД
                                                 publicMessage = false;
                                                 toUser = Integer.parseInt(jsonUserObject.get("id").toString());
+                                                jsonObject1.put("action", "getMessages");
+                                                jsonObject1.put("toUser", toUser);
+                                                try {
+                                                    out.writeUTF(jsonObject1.toJSONString());
+                                                } catch (IOException ex) {
+                                                    throw new RuntimeException(ex);
+                                                }
                                             });
                                         });
                                     }
