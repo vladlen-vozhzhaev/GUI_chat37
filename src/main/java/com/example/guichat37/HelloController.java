@@ -7,13 +7,13 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 
 public class HelloController {
@@ -36,17 +36,35 @@ public class HelloController {
     @FXML
     private VBox usersList;
     @FXML
+    private Button inputBtn;
+    private File file;
+    @FXML
     protected void send() {
         try {
             JSONObject jsonObject = new JSONObject();
-            String message = messageTextField.getText();
-            System.out.println(message);
-            messageTextArea.appendText("Вы: "+message+"\n");
-            messageTextField.clear();
-            jsonObject.put("public", publicMessage);
-            jsonObject.put("msg", message);
-            jsonObject.put("id", toUser);
-            out.writeUTF(jsonObject.toJSONString());
+            if(file != null){
+                jsonObject.put("action", "sendFile");
+                jsonObject.put("fileName", file.getName());
+                out.writeUTF(jsonObject.toJSONString());
+                FileInputStream fis = new FileInputStream(file);
+                BufferedInputStream bis = new BufferedInputStream(fis);
+                byte[] buffer = new byte[1024];
+                int i;
+                while ((i = bis.read(buffer)) != -1){
+                    out.write(buffer);
+                }
+                out.flush();
+                file = null;
+            }else{
+                String message = messageTextField.getText();
+                System.out.println(message);
+                messageTextArea.appendText("Вы: "+message+"\n");
+                messageTextField.clear();
+                jsonObject.put("public", publicMessage);
+                jsonObject.put("msg", message);
+                jsonObject.put("id", toUser);
+                out.writeUTF(jsonObject.toJSONString());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -119,4 +137,16 @@ public class HelloController {
             throw new RuntimeException(e);
         }
     }
+
+    @FXML
+    public void fileReceiver(){
+        Stage stage = (Stage) inputBtn.getScene().getWindow();
+        FileChooser fileChooser = new FileChooser();
+        file = fileChooser.showOpenDialog(stage);
+        if(file != null){
+            String fileName = file.getName();
+            messageTextField.setText(fileName);
+        }
+    }
+
 }

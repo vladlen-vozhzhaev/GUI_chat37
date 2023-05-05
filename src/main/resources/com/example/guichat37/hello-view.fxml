@@ -10,6 +10,7 @@
       <TextArea editable="false" prefHeight="350" prefWidth="Infinity" fx:id="messageTextArea"/>
       <HBox prefHeight="50.0" prefWidth="Infinity">
             <TextField onAction="#send" prefWidth="225" fx:id="messageTextField"/>
+            <Button onAction="#fileReceiver" text="file" fx:id="inputBtn"/>
             <Button fx:id="sendBtn" onAction="#send" prefWidth="75" text="Отправить" disable="true"/>
       </HBox>
       <Button
